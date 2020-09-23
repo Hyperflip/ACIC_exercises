@@ -25,10 +25,12 @@ MyString::MyString(const char* arr) {
     this->arr = new char[this->length];
     strcpy(this->arr, arr);
 }
-
+/*
+concatenate appends another string to the original string
+*/
 void MyString::Concatenate(MyString* str2) {
     /*
-    create new array ON THE HEAP with a
+    create a new array ON THE HEAP with a
     length of the sum of both string's lengths + 1
     (+1 for the termination char).
     the array needs to be created on the heap, else it
