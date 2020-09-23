@@ -33,7 +33,6 @@ void MyString::Concatenate(MyString* str2) {
     resultArr[length] = '\0';
 
     // assign new array to this
-    delete this->arr;
     this->arr = resultArr;
 }
 
