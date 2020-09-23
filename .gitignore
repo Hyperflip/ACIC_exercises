@@ -35,4 +35,5 @@
 exercise1
 
 # VSC
-settings.json.vscode
+.json
+.vscode
