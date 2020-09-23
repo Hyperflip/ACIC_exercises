@@ -12,4 +12,5 @@ mystring.o: MyString.h MyString.cpp
 run: all
 		./exercise1
 
-clean: rm -rf exercise1
+clean:
+		rm *.o exercise1 -f
