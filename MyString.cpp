@@ -2,8 +2,28 @@
 #include <iostream>
 #include <string.h>
 
+int MyString::lengthOf(const char* arr) {
+    /*
+    count up and iterate over the char array
+    until the terminator char ('\0') is hit,
+    this is the length of the char array
+    */
+    int i = 0;
+    for(i = 0; arr[i] != '\0'; i++);
+    return i;
+}
+
 MyString::MyString(const char* arr) {
-    this->arr = arr;
+    this->length = lengthOf(arr);
+    /*
+    the array needs to be created on the heap,
+    because Concatenate() will replace the array
+    with an array created on the heap.
+    this way, 'delete array' in Concatenate() will always
+    safely delete the previous array before replacing it
+    */
+    this->arr = new char[this->length];
+    strcpy(this->arr, arr);
 }
 
 void MyString::Concatenate(MyString* str2) {
@@ -32,8 +52,12 @@ void MyString::Concatenate(MyString* str2) {
     // append termination char at the end
     resultArr[length] = '\0';
 
-    // assign new array to this
+    // delete the previous array
+    delete this->arr;
+    // assign new array
     this->arr = resultArr;
+    // update the length
+    this->length = lengthOf(this->arr);
 }
 
 /*
@@ -45,14 +69,7 @@ void MyString::Concatenate(MyString str2) {
 }
 
 int MyString::GetLength() {
-    /*
-    count up and iterate over the char array
-    until the terminator char ('\0') is hit,
-    this is the length of the char array
-    */
-    int i = 0;
-    for(i = 0; this->arr[i] != '\0'; i++);
-    return i;
+    return this->length;
 }
 
 const char* MyString::c_str() {

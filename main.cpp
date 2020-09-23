@@ -6,7 +6,7 @@ Author: Philipp Andert
 #include "MyString.h"
 
 int main() {
-
+    
     MyString* str = new MyString("Foo");
     MyString* str2 = new MyString("Bar");
 

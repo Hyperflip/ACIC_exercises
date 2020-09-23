@@ -1,6 +1,8 @@
 class MyString {
 private:
-    const char* arr;
+    char* arr;
+    int length;
+    static int lengthOf(const char* arr);
 public:
     MyString(const char* arr);
     /*
