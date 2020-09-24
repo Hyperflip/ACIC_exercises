@@ -60,20 +60,12 @@ MyString* MyString::Concatenate(MyString* str, MyString* str2) {
   +       #     -> appension of term char
   = FooBar#     -> final char array
     */
-    
+
     // return a new MyString
     MyString* resultString = new MyString(resultArr);
     resultString->length = length;
     return resultString;
 }
-
-/*
-overloaded signature for passing instances of MyString
-instead of references
-MyString* MyString::Concatenate(MyString str2) {
-    return this->Concatenate(&str2);
-}
-*/
 
 int MyString::GetLength() {
     return this->length;

@@ -20,6 +20,7 @@ int main() {
 
     delete str;
     delete str2;
+    delete str3;
 
     return 0;
 }
