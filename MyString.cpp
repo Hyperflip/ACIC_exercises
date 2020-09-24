@@ -14,61 +14,66 @@ int MyString::lengthOf(const char* arr) {
 }
 
 MyString::MyString(const char* arr) {
+    this->arr = arr;
     this->length = lengthOf(arr);
-    /*
-    the array needs to be created on the heap,
-    because Concatenate() will replace the array
-    with an array created on the heap.
-    this way, 'delete array' in Concatenate() will always
-    safely delete the previous array before replacing it
-    */
-    this->arr = new char[this->length];
-    strcpy(this->arr, arr);
 }
-/*
-concatenate appends another string to the original string
-*/
-void MyString::Concatenate(MyString* str2) {
+
+MyString* MyString::Concatenate(MyString* str, MyString* str2) {
     /*
-    create a new array ON THE HEAP with a
-    length of the sum of both string's lengths + 1
-    (+1 for the termination char).
-    the array needs to be created on the heap, else it
-    will be destroyed once the function exits
+    the array resulting from concatenation does NOT
+    need to be created on the HEAP, as it will be
+    passed to the scope of the new MyString object,
+    which will be returned. this new object has to be
+    created on the heap, as it would otherwise be destroyed
+    once the function terminates
     */
-    int length = this->GetLength() + str2->GetLength();
-    char* resultArr = new char[length + 1];
+    int length = str->GetLength() + str2->GetLength();
+    char resultArr[length + 1];
 
     // copy the first array into resultArr
-    strcpy(resultArr, this->arr);
+    strcpy(resultArr, str->arr);
 
     /*
     the starting position for the appension of str2 equals
     the array's pointer + an offset (the length of the first str)
     */
-    char* concatPos = resultArr + this->GetLength();
+    char* concatPos = resultArr + str->GetLength();
 
     // copy str2 into new position
     strcpy(concatPos, str2->c_str());
 
-    // append termination char at the end
+    /*
+    just in case append termination char at the end,
+    even though strcpy should copy it as well.
+    maybe it's required to implement strcpy ourselves
+    in a future exercise ¯\_(ツ)_/¯, which is why
+    I'm keeping it in
+    */
     resultArr[length] = '\0';
 
-    // delete the previous array
-    delete this->arr;
-    // assign new array
-    this->arr = resultArr;
-    // update the length
-    this->length = lengthOf(this->arr);
+    /*
+    expected procedure of this implementation:
+
+    .......     -> empty resultArr
+  + Foo#        -> after first strcpy
+  +    Bar#     -> after second strcpy
+  +       #     -> appension of term char
+  = FooBar#     -> final char array
+    */
+    
+    // return a new MyString
+    MyString* resultString = new MyString(resultArr);
+    resultString->length = length;
+    return resultString;
 }
 
 /*
 overloaded signature for passing instances of MyString
 instead of references
-*/
-void MyString::Concatenate(MyString str2) {
-    this->Concatenate(&str2);
+MyString* MyString::Concatenate(MyString str2) {
+    return this->Concatenate(&str2);
 }
+*/
 
 int MyString::GetLength() {
     return this->length;

@@ -6,17 +6,17 @@ Author: Philipp Andert
 #include "MyString.h"
 
 int main() {
-    
+
     MyString* str = new MyString("Foo");
     MyString* str2 = new MyString("Bar");
 
     std::cout << "str: " << str->c_str() << std::endl;
     std::cout << "str2: " << str2->c_str() << std::endl;
     
-    str->Concatenate(str2);
+    MyString* str3 = MyString::Concatenate(str, str2);
 
-    std::cout << "str after concatenation: " << str->c_str() << std::endl;
-    std::cout << "length of str: " << str->GetLength() << std::endl;
+    std::cout << "str3 " << str3->c_str() << std::endl;
+    std::cout << "length of str3: " << str3->GetLength() << std::endl;
 
     delete str;
     delete str2;
