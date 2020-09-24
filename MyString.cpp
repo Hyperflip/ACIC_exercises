@@ -13,9 +13,23 @@ int MyString::lengthOf(const char* arr) {
     return i;
 }
 
+/*
+the internal array needs to be allocated anew, else a
+manipulation of the original array that was passed will
+change the contents of the internal array
+*/
 MyString::MyString(const char* arr) {
-    this->arr = arr;
     this->length = lengthOf(arr);
+    /*
+    +1 for the termination char, which
+    will be copied over with strcpy
+    */
+    this->arr = new char[length + 1];
+    strcpy(this->arr, arr);
+}
+
+MyString::~MyString() {
+    delete[] this->arr;
 }
 
 MyString* MyString::Concatenate(MyString* str, MyString* str2) {
@@ -23,9 +37,8 @@ MyString* MyString::Concatenate(MyString* str, MyString* str2) {
     the array resulting from concatenation does NOT
     need to be created on the HEAP, as it will be
     passed to the scope of the new MyString object,
-    which will be returned. this new object has to be
-    created on the heap, as it would otherwise be destroyed
-    once the function terminates
+    which will be returned. in the constructor of MyString,
+    a new char array will be alocated.
     */
     int length = str->GetLength() + str2->GetLength();
     char resultArr[length + 1];
@@ -63,7 +76,6 @@ MyString* MyString::Concatenate(MyString* str, MyString* str2) {
 
     // return a new MyString
     MyString* resultString = new MyString(resultArr);
-    resultString->length = length;
     return resultString;
 }
 

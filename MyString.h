@@ -1,21 +1,18 @@
 class MyString {
 private:
-    const char* arr;
+    char* arr;
     int length;
     // method for calculating the length of a char array
     static int lengthOf(const char* arr);
 public:
     MyString(const char* arr);
     /*
-    custom destructor not neccessary, as
-    default destructor calls delete on ALL
-    member variables and functions when
-    delete is called on the object.
-    as this->arr only stores primitives
-    (the characters), no further deletion
-    is needed in a custom destructor
+    destructor neccessary to clean up the
+    char array that was allocated on the heap
+    in the constructor
     */
-    
+    ~MyString();
+
     /*
     I decided for Concatenate() to be a static method that
     takes two MyStrings and returns another new MyString.
