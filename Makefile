@@ -1,16 +1,13 @@
-all: exercise1
+all: exercise2
 
-exercise1: main.o mystring.o
-		g++ -std=c++17 -fsanitize=leak *.o -o exercise1
+exercise2: main.o
+		g++ -std=c++17 -fsanitize=leak main.o -o exercise2
 
 main.o: main.cpp
 		g++ -std=c++17 -fsanitize=leak -c main.cpp
 
-mystring.o: MyString.h MyString.cpp
-		g++ -std=c++17 -fsanitize=leak -c MyString.cpp
-
 run: all
-		./exercise1
+		./exercise2
 
 clean:
-		rm *.o exercise1 -f
+		rm *.o exercise2 -f

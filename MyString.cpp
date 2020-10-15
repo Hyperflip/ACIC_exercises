@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string.h>
 
+
 int MyString::lengthOf(const char* arr) {
     /*
     count up and iterate over the char array
@@ -13,16 +14,17 @@ int MyString::lengthOf(const char* arr) {
     return i;
 }
 
-/*
-the internal array needs to be allocated anew, else a
-manipulation of the original array that was passed will
-change the contents of the internal array
-*/
+
 MyString::MyString(const char* arr) {
-    this->length = lengthOf(arr);
     /*
     +1 for the termination char, which
     will be copied over with strcpy
+    */
+    this->length = lengthOf(arr);
+    /*
+    the internal array needs to be allocated anew, else a
+    manipulation of the original array that was passed will
+    change the contents of the internal array
     */
     this->arr = new char[length + 1];
     strcpy(this->arr, arr);
