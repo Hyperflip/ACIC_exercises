@@ -1,5 +1,15 @@
 /*
 Author: Philipp Andert
+
+General TODO:
+* clean up comments regarding decisions from previous exercises (?)
+
+UE1 Feedback & TODO:
+    * LengthOf als auch GetLength hätten const sein können
+    * unnötige Kopie in concatenate (char[] wird erstellt und dann auf MyString kopiert)
+    * es könnte ein Speicherproblem im Zusammenhang mit Concatenate entstehen - RAII beachten
+    * warning: variable length array - ISO C++ forbids variable length array
+    * kein default Konstruktor
 */
 
 #include <iostream>
@@ -23,6 +33,12 @@ private:
     }
 
 public:
+    // default constructor (unfinished?)
+    MyString() {
+        this->length = 0;
+    }
+
+    // constructor called with const char*
     MyString(const char* arr) {
         /*
         +1 for the termination char, which
@@ -38,6 +54,9 @@ public:
         strcpy(this->arr, arr);
     }
 
+    // copy constructor: implementation using constructor delegation
+    MyString(MyString* other) : MyString(other->c_str()) { }
+
     /*
     destructor neccessary to clean up the
     char array that was allocated on the heap
@@ -45,6 +64,16 @@ public:
     */
     ~MyString() {
         delete[] this->arr;
+    }
+
+    void swapArr(MyString left, MyString right) {
+        std::swap(left.arr, right.arr);
+    }
+
+    MyString& operator=(MyString other) {
+        MyString temp(other);
+        swapArr(this, temp);
+        return *this;
     }
 
     /*
@@ -111,20 +140,18 @@ public:
 
 int main() {
 
-    MyString* str = new MyString("Foo");
+    MyString* str1 = new MyString("Foo");
     MyString* str2 = new MyString("Bar");
 
-    std::cout << "str: " << str->c_str() << std::endl;
+    std::cout << "str1: " << str1->c_str() << std::endl;
     std::cout << "str2: " << str2->c_str() << std::endl;
-    
-    MyString* str3 = MyString::Concatenate(str, str2);
 
-    std::cout << "str3: " << str3->c_str() << std::endl;
-    std::cout << "length of str3: " << str3->GetLength() << std::endl;
+    str2 = str1;
 
-    delete str;
+    std::cout << "str2 = str1: " << str2->c_str() << std::endl;
+
+    delete str1;
     delete str2;
-    delete str3;
 
     return 0;
 }
