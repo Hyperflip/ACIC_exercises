@@ -5,11 +5,11 @@ General TODO:
 * clean up comments regarding decisions from previous exercises (?)
 
 UE1 Feedback & TODO:
-    * LengthOf als auch GetLength hätten const sein können
-    * unnötige Kopie in concatenate (char[] wird erstellt und dann auf MyString kopiert)
-    * es könnte ein Speicherproblem im Zusammenhang mit Concatenate entstehen - RAII beachten
-    * warning: variable length array - ISO C++ forbids variable length array
-    * kein default Konstruktor
+    * [DONE] LengthOf als auch GetLength hätten const sein können
+    * [DONE] unnötige Kopie in concatenate (char[] wird erstellt und dann auf MyString kopiert)
+    * [?] es könnte ein Speicherproblem im Zusammenhang mit Concatenate entstehen - RAII beachten
+    * [?] warning: variable length array - ISO C++ forbids variable length array
+    * [DONE] kein default Konstruktor
 */
 
 #include <iostream>
@@ -21,7 +21,7 @@ private:
     int length;
 
     // method for calculating the length of a char array
-    static int lengthOf(const char* arr) {
+    const int lengthOf(const char* arr) const {
         /*
         count up and iterate over the char array
         until the terminator char ('\0') is hit,
@@ -33,12 +33,15 @@ private:
     }
 
 public:
-    // default constructor (unfinished?)
     MyString() {
         this->length = 0;
     }
 
-    // constructor called with const char*
+    MyString(int length) {
+        this->length = length;
+        this->arr = new char[length + 1];
+    }
+
     MyString(const char* arr) {
         /*
         +1 for the termination char, which
@@ -66,13 +69,9 @@ public:
         delete[] this->arr;
     }
 
-    void swapArr(MyString left, MyString right) {
-        std::swap(left.arr, right.arr);
-    }
-
     MyString& operator=(MyString other) {
-        MyString temp(other);
-        swapArr(this, temp);
+        MyString temp(&other);
+        std::swap(*this, temp);
         return *this;
     }
 
@@ -84,23 +83,19 @@ public:
     */
     static MyString* Concatenate(MyString* str, MyString* str2) {
         /*
-        the array resulting from concatenation does NOT
-        need to be created on the HEAP, as it will be
-        passed to the scope of the new MyString object,
-        which will be returned. in the constructor of MyString,
-        a new char array will be alocated.
+        create a new empty MyString with length of str + str2
         */
         int length = str->GetLength() + str2->GetLength();
-        char resultArr[length + 1];
+        MyString* resultStr = new MyString(length);
 
-        // copy the first array into resultArr
-        strcpy(resultArr, str->arr);
+        // copy the first array into the new array
+        strcpy(resultStr->arr, str->arr);
 
         /*
         the starting position for the appension of str2 equals
         the array's pointer + an offset (the length of the first str)
         */
-        char* concatPos = resultArr + str->GetLength();
+        char* concatPos = resultStr->arr + str->GetLength();
 
         // copy str2 into new position
         strcpy(concatPos, str2->c_str());
@@ -112,12 +107,12 @@ public:
         in a future exercise ¯\_(ツ)_/¯, which is why
         I'm keeping it in
         */
-        resultArr[length] = '\0';
+        resultStr->arr[length] = '\0';
 
         /*
         expected procedure of this implementation:
 
-        .......     -> empty resultArr
+        .......     -> empty resultStr->arr
       + Foo#        -> after first strcpy
       +    Bar#     -> after second strcpy
       +       #     -> appension of term char
@@ -125,11 +120,10 @@ public:
         */
 
         // return a new MyString
-        MyString* resultString = new MyString(resultArr);
-        return resultString;
+        return resultStr;
     }
 
-    int GetLength() {
+    const int GetLength() const {
         return this->length;
     }
 
@@ -146,12 +140,13 @@ int main() {
     std::cout << "str1: " << str1->c_str() << std::endl;
     std::cout << "str2: " << str2->c_str() << std::endl;
 
-    str2 = str1;
+    MyString* str3 = MyString::Concatenate(str1, str2);
 
-    std::cout << "str2 = str1: " << str2->c_str() << std::endl;
+    std::cout << "str3: " << str3->c_str() << std::endl;
 
     delete str1;
     delete str2;
+    delete str3;
 
     return 0;
 }
