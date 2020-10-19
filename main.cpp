@@ -73,6 +73,8 @@ public:
     }
 
     MyString& operator=(MyString other) {
+        // source: http://cplusplus.bordoon.com/copyConstructors.html
+        
         // destroy this
         this->MyString::~MyString();
         // rebuild this from other using copy constructor
