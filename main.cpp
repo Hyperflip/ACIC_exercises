@@ -1,15 +1,18 @@
 /*
 Author: Philipp Andert
 
-General TODO:
-* clean up comments regarding decisions from previous exercises (?)
-
 UE1 Feedback & TODO:
     * [DONE] LengthOf als auch GetLength hätten const sein können
     * [DONE] unnötige Kopie in concatenate (char[] wird erstellt und dann auf MyString kopiert)
     * [?] es könnte ein Speicherproblem im Zusammenhang mit Concatenate entstehen - RAII beachten
     * [?] warning: variable length array - ISO C++ forbids variable length array
     * [DONE] kein default Konstruktor
+
+new to UE2:
+    * MyString::MyString(Mystring* other);
+    * MyString& MyString::=operator(MyString other);
+    * new demo main routine
+
 */
 
 #include <iostream>
@@ -70,32 +73,35 @@ public:
     }
 
     MyString& operator=(MyString other) {
-        MyString temp(&other);
-        std::swap(*this, temp);
+        // destroy this
+        this->MyString::~MyString();
+        // rebuild this from other using copy constructor
+        new(this) MyString(&other);
+
         return *this;
     }
 
     /*
     I decided for Concatenate() to be a static method that
-    takes two MyStrings and returns another new MyString.
+    takes two MyStrings and returns another MyString.
     It seemed sensible to me to think of Concatenate() as a
-    utility function, as it does not alter any one MyString.
+    static utility function, as it does not alter any one MyString.
     */
-    static MyString* Concatenate(MyString* str, MyString* str2) {
+    static MyString Concatenate(MyString* str, MyString* str2) {
         /*
         create a new empty MyString with length of str + str2
         */
         int length = str->GetLength() + str2->GetLength();
-        MyString* resultStr = new MyString(length);
+        MyString resultStr = MyString(length);
 
         // copy the first array into the new array
-        strcpy(resultStr->arr, str->arr);
+        strcpy(resultStr.arr, str->arr);
 
         /*
         the starting position for the appension of str2 equals
         the array's pointer + an offset (the length of the first str)
         */
-        char* concatPos = resultStr->arr + str->GetLength();
+        char* concatPos = resultStr.arr + str->GetLength();
 
         // copy str2 into new position
         strcpy(concatPos, str2->c_str());
@@ -107,11 +113,10 @@ public:
         in a future exercise ¯\_(ツ)_/¯, which is why
         I'm keeping it in
         */
-        resultStr->arr[length] = '\0';
+        resultStr.arr[length] = '\0';
 
         /*
         expected procedure of this implementation:
-
         .......     -> empty resultStr->arr
       + Foo#        -> after first strcpy
       +    Bar#     -> after second strcpy
@@ -119,7 +124,6 @@ public:
       = FooBar#     -> final char array
         */
 
-        // return a new MyString
         return resultStr;
     }
 
@@ -134,19 +138,15 @@ public:
 
 int main() {
 
-    MyString* str1 = new MyString("Foo");
-    MyString* str2 = new MyString("Bar");
+    MyString str1 = MyString("Hello");
+    MyString str2 = MyString("ACIC");
 
-    std::cout << "str1: " << str1->c_str() << std::endl;
-    std::cout << "str2: " << str2->c_str() << std::endl;
+    std::cout << "str1: " << str1.c_str() << std::endl;
+    std::cout << "str2: " << str2.c_str() << std::endl;
 
-    MyString* str3 = MyString::Concatenate(str1, str2);
-
-    std::cout << "str3: " << str3->c_str() << std::endl;
-
-    delete str1;
-    delete str2;
-    delete str3;
+    str2 = str1;
+    std::cout << "str2 = str1: " << str2.c_str() << std::endl;
+    std::cout << "str2 length: " << str2.GetLength() << std::endl;
 
     return 0;
 }
