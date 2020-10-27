@@ -72,6 +72,7 @@ public:
         delete[] this->arr;
     }
 
+    // NOTE: "MyString&" as the object returned has to have the same address as the assignee
     MyString& operator=(MyString other) {
         // source: http://cplusplus.bordoon.com/copyConstructors.html
         
@@ -82,6 +83,16 @@ public:
             new(this) MyString(&other);
         }
 
+        return *this;
+    }
+
+    
+    MyString operator+(MyString other) {
+        return (Concatenate(this, &other));
+    }
+
+    MyString& operator+=(MyString other) {
+        *this = *this + other;
         return *this;
     }
 
@@ -144,13 +155,17 @@ int main() {
 
     MyString str1 = MyString("Hello");
     MyString str2 = MyString("ACIC");
-
     std::cout << "str1: " << str1.c_str() << std::endl;
     std::cout << "str2: " << str2.c_str() << std::endl;
 
-    str2 = str1;
-    std::cout << "str2 = str1: " << str2.c_str() << std::endl;
-    std::cout << "str2 length: " << str2.GetLength() << std::endl;
+    MyString str3 = str1 + " " + str2;
+    std::cout << "str3 = str1 + \" \" + str2: " << str3.c_str() << std::endl;
+
+    MyString str4 = MyString("!!!");
+    std::cout << "str4: " << str4.c_str() << std::endl;
+
+    str3 += str4;
+    std::cout << "str3 += str4: " << str3.c_str() << std::endl;
 
     return 0;
 }
