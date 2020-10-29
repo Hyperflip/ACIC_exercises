@@ -96,6 +96,11 @@ public:
         return *this;
     }
 
+    // conversion to const char*
+    operator const char*() const {
+        return this->arr;
+    }
+
     /*
     I decided for Concatenate() to be a static method that
     takes two MyStrings and returns another MyString.
@@ -158,6 +163,7 @@ int main() {
     std::cout << "str1: " << str1.c_str() << std::endl;
     std::cout << "str2: " << str2.c_str() << std::endl;
 
+    // NOTE: implicit cast from const char* to MyString
     MyString str3 = str1 + " " + str2;
     std::cout << "str3 = str1 + \" \" + str2: " << str3.c_str() << std::endl;
 
@@ -166,6 +172,9 @@ int main() {
 
     str3 += str4;
     std::cout << "str3 += str4: " << str3.c_str() << std::endl;
+
+    const char* arr = (const char*)str3;
+    std::cout << "const char* arr = (const char*)str3: " << arr << std::endl;
 
     return 0;
 }
