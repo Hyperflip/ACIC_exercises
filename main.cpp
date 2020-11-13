@@ -36,13 +36,12 @@ private:
     }
 
 public:
-    MyString() {
-        this->length = 0;
-    }
+    MyString() : MyString(0) { }
 
     MyString(int length) {
         this->length = length;
         this->arr = new char[length + 1];
+        this->arr[length] = '\0';
     }
 
     MyString(const char* arr) {
@@ -58,10 +57,11 @@ public:
         */
         this->arr = new char[length + 1];
         strcpy(this->arr, arr);
+        this->arr[length] = '\0';
     }
 
     // copy constructor: implementation using constructor delegation
-    MyString(MyString* other) : MyString(other->c_str()) { }
+    MyString(const MyString& other) : MyString(other.c_str()) { }
 
     /*
     destructor neccessary to clean up the
@@ -73,26 +73,38 @@ public:
     }
 
     // NOTE: "MyString&" as the object returned has to have the same address as the assignee
-    MyString& operator=(MyString other) {
+    MyString& operator=(MyString& other) {
         // source: http://cplusplus.bordoon.com/copyConstructors.html
         
         if(this != &other) {
             // destroy this
             this->MyString::~MyString();
             // rebuild this from other using copy constructor
-            new(this) MyString(&other);
+            new(this) MyString(other);
         }
 
         return *this;
     }
 
     
-    MyString operator+(MyString other) {
-        return (Concatenate(this, &other));
+    MyString& operator+(MyString& other) {
+
+        MyString temp(*this);
+        MyString temp2 = Concatenate(temp, other);
+        temp = temp2;
+
+        return temp;
     }
 
-    MyString& operator+=(MyString other) {
-        *this = *this + other;
+    MyString& operator+=(MyString& other) {
+        
+        MyString temp = *this + other;
+        /*
+        can temp be returned directly, instead of re-assigning this?
+        to be continued...
+        */
+        *this = temp;
+
         return *this;
     }
 
@@ -107,24 +119,24 @@ public:
     It seemed sensible to me to think of Concatenate() as a
     static utility function, as it does not alter any one MyString.
     */
-    static MyString Concatenate(MyString* str, MyString* str2) {
+    static MyString Concatenate(MyString& str, MyString& str2) {
         /*
         create a new empty MyString with length of str + str2
         */
-        int length = str->GetLength() + str2->GetLength();
+        int length = str.GetLength() + str2.GetLength();
         MyString resultStr = MyString(length);
 
         // copy the first array into the new array
-        strcpy(resultStr.arr, str->arr);
+        strcpy(resultStr.arr, str.arr);
 
         /*
         the starting position for the appension of str2 equals
         the array's pointer + an offset (the length of the first str)
         */
-        char* concatPos = resultStr.arr + str->GetLength();
+        char* concatPos = resultStr.arr + str.GetLength();
 
         // copy str2 into new position
-        strcpy(concatPos, str2->c_str());
+        strcpy(concatPos, str2.c_str());
 
         /*
         just in case append termination char at the end,
@@ -151,7 +163,7 @@ public:
         return this->length;
     }
 
-    const char* c_str() {
+    const char* c_str() const {
         return this->arr;
     }
 };
@@ -164,7 +176,7 @@ int main() {
     std::cout << "str2: " << str2.c_str() << std::endl;
 
     // NOTE: implicit cast from const char* to MyString
-    MyString str3 = str1 + " " + str2;
+    MyString str3 = str1 + str2;
     std::cout << "str3 = str1 + \" \" + str2: " << str3.c_str() << std::endl;
 
     MyString str4 = MyString("!!!");
