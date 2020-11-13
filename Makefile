@@ -1,10 +1,10 @@
 all: exercise
 
 exercise: main.o
-		g++ -std=c++17 -fsanitize=leak main.o -o exercise
+		clang -lstdc++ -std=c++17 -fsanitize=leak main.o -o exercise
 
 main.o: main.cpp
-		g++ -std=c++17 -fsanitize=leak -c main.cpp
+		clang -std=c++17 -fsanitize=leak -c main.cpp
 
 run: all
 		./exercise

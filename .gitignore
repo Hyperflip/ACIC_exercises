@@ -34,6 +34,9 @@
 # linux executable
 exercise
 
+# weird macOS stuff
+.DS_Store
+
 # VSC
 .json
 .vscode

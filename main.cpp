@@ -72,8 +72,12 @@ public:
         delete[] this->arr;
     }
 
+    operator const char*() const {
+        return this->c_str();
+    }
+
     // NOTE: "MyString&" as the object returned has to have the same address as the assignee
-    MyString& operator=(MyString& other) {
+    MyString& operator=(const MyString& other) {
         // source: http://cplusplus.bordoon.com/copyConstructors.html
         
         if(this != &other) {
@@ -86,31 +90,26 @@ public:
         return *this;
     }
 
-    
-    MyString& operator+(MyString& other) {
-
-        MyString temp(*this);
-        MyString temp2 = Concatenate(temp, other);
-        temp = temp2;
-
-        return temp;
+    /*
+    returns by value, because Concatenate does as well,
+    since they only manipulate the values of MyString
+    */
+    MyString operator+(const MyString& other) {
+        MyString tmp = Concatenate(*this, other);
+        return tmp;
     }
 
-    MyString& operator+=(MyString& other) {
-        
-        MyString temp = *this + other;
+    /*
+    returns by reference, as it is critical to for left
+    opperand to keep its address
+    */
+    MyString& operator+=(const MyString& other) {
         /*
-        can temp be returned directly, instead of re-assigning this?
-        to be continued...
+        result of '+' needs to be assigned to this first and can't
+        be returned directly, as the result will be returned by reference
         */
-        *this = temp;
-
+        *this = *this + other;
         return *this;
-    }
-
-    // conversion to const char*
-    operator const char*() const {
-        return this->arr;
     }
 
     /*
@@ -119,7 +118,7 @@ public:
     It seemed sensible to me to think of Concatenate() as a
     static utility function, as it does not alter any one MyString.
     */
-    static MyString Concatenate(MyString& str, MyString& str2) {
+    static MyString Concatenate(const MyString& str, const MyString& str2) {
         /*
         create a new empty MyString with length of str + str2
         */
@@ -170,23 +169,17 @@ public:
 
 int main() {
 
-    MyString str1 = MyString("Hello");
-    MyString str2 = MyString("ACIC");
+    MyString str1 = MyString("one");
+    MyString str2 = MyString("two");
     std::cout << "str1: " << str1.c_str() << std::endl;
     std::cout << "str2: " << str2.c_str() << std::endl;
 
-    // NOTE: implicit cast from const char* to MyString
-    MyString str3 = str1 + str2;
-    std::cout << "str3 = str1 + \" \" + str2: " << str3.c_str() << std::endl;
+    str1 += str2;
+    std::cout << "str1 += str2: " << str1.c_str() << std::endl;
 
-    MyString str4 = MyString("!!!");
-    std::cout << "str4: " << str4.c_str() << std::endl;
+    MyString str3 = MyString("This will be puts.");
 
-    str3 += str4;
-    std::cout << "str3 += str4: " << str3.c_str() << std::endl;
-
-    const char* arr = (const char*)str3;
-    std::cout << "const char* arr = (const char*)str3: " << arr << std::endl;
+    puts(str3);
 
     return 0;
 }
