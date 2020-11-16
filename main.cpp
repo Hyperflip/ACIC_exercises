@@ -99,17 +99,25 @@ public:
         return tmp;
     }
 
+    MyString operator+(const char* arr) {
+        return MyString::operator+(MyString(arr));
+    }
+
     /*
     returns by reference, as it is critical to for left
     opperand to keep its address
     */
     MyString& operator+=(const MyString& other) {
         /*
-        result of '+' needs to be assigned to this first and can't
+        result of Concatenate needs to be assigned to this first and can't
         be returned directly, as the result will be returned by reference
         */
-        *this = *this + other;
+        *this = Concatenate(*this, other);
         return *this;
+    }
+
+    MyString& operator+=(const char* arr) {
+        return MyString::operator+=(MyString(arr));
     }
 
     /*
@@ -169,17 +177,28 @@ public:
 
 int main() {
 
-    MyString str1 = MyString("one");
-    MyString str2 = MyString("two");
-    std::cout << "str1: " << str1.c_str() << std::endl;
-    std::cout << "str2: " << str2.c_str() << std::endl;
+    MyString s1 = MyString("a");
+    MyString s2 = MyString("b");
+    MyString s3 = MyString("c");
 
-    str1 += str2;
-    std::cout << "str1 += str2: " << str1.c_str() << std::endl;
+    std::cout << "s1: " << s1.c_str() << std::endl;
+    std::cout << "s2: " << s2.c_str() << std::endl;
+    std::cout << "s3: " << s3.c_str() << "\n" << std::endl;
 
-    MyString str3 = MyString("This will be puts.");
+    s3 += s2;
+    std::cout << "s3 += s2: " << s3.c_str() << std::endl;
 
-    puts(str3);
+    s3 += "Hello";
+    std::cout << "s3 += \"Hello\": " << s3.c_str() << "\n" << std::endl;
+
+    MyString s4 = s1 + s2;
+    std::cout << "MyString s4 = s1 + s2: " << s4.c_str() << std::endl;
+    
+    s4 = s4 + "World";
+    std::cout << "s4 = s4 + \"World\": " << s4.c_str() << "\n" << std::endl;
+
+    std::cout << "puts(s4): ";
+    puts(s4);
 
     return 0;
 }
