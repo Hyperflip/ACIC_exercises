@@ -91,12 +91,11 @@ public:
     }
 
     /*
-    returns by value, because Concatenate does as well,
-    since they only manipulate the values of MyString
+    returns by value, because nothing gets assigned and a new
+    value (a new char array) is calculated
     */
     MyString operator+(const MyString& other) {
-        MyString tmp = Concatenate(*this, other);
-        return tmp;
+        return Concatenate(*this, other);
     }
 
     MyString operator+(const char* arr) {
@@ -104,8 +103,8 @@ public:
     }
 
     /*
-    returns by reference, as it is critical to for left
-    opperand to keep its address
+    returns by reference, since the value is assigned to the left
+    opperand
     */
     MyString& operator+=(const MyString& other) {
         /*
