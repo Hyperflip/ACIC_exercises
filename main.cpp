@@ -1,18 +1,5 @@
 /*
 Author: Philipp Andert
-
-UE1 Feedback & TODO:
-    * [DONE] LengthOf als auch GetLength hätten const sein können
-    * [DONE] unnötige Kopie in concatenate (char[] wird erstellt und dann auf MyString kopiert)
-    * [?] es könnte ein Speicherproblem im Zusammenhang mit Concatenate entstehen - RAII beachten
-    * [?] warning: variable length array - ISO C++ forbids variable length array
-    * [DONE] kein default Konstruktor
-
-new to UE2:
-    * MyString::MyString(Mystring* other);
-    * MyString& MyString::=operator(MyString other);
-    * new demo main routine
-
 */
 
 #include <iostream>
