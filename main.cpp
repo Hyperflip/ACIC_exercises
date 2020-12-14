@@ -20,6 +20,7 @@ new to UE2:
 
 class MyString {
 private:
+
     char* arr;
     int length;
 
@@ -36,6 +37,42 @@ private:
     }
 
 public:
+
+    class Iterator{
+    public:
+        /*
+        current reference to a character in the parent MyString,
+        this is a pointer, so it can easily be incremented in operator++
+        */
+        char* pos;
+
+        // Iterators can be initiliazed at any position
+        Iterator(char* pos) {
+            this->pos = pos;
+        }
+        
+        // increment to the next char in memory
+        Iterator& operator++() {
+            this->pos++;
+            return *this;
+        }
+
+        // compare two Iterators; done by comparing both Iterator's char references
+        bool operator==(const Iterator& other) const {
+            return this->pos == other.pos;
+        }
+
+        bool operator!=(const Iterator& other) const {
+            return !(*this == other);
+        }
+
+        // dereferencing Iterators yields the current char that the Iterator references
+        char operator*() {
+            return *this->pos;
+        }
+
+    };
+
     MyString() : MyString(0) { }
 
     MyString(int length) {
@@ -172,32 +209,27 @@ public:
     const char* c_str() const {
         return this->arr;
     }
+
+    // returns the first char of the parent MyString
+    Iterator begin() {
+        Iterator it = Iterator(&this->arr[0]);
+        return it;
+    }
+
+    // return the past-the-end character of the parent MyString (terminator char)
+    Iterator end() {
+        Iterator it = Iterator(&this->arr[this->GetLength()]);
+        return it;
+    }
 };
 
 int main() {
 
-    MyString s1 = MyString("a");
-    MyString s2 = MyString("b");
-    MyString s3 = MyString("c");
+    MyString string = MyString("Hello World!");
 
-    std::cout << "s1: " << s1.c_str() << std::endl;
-    std::cout << "s2: " << s2.c_str() << std::endl;
-    std::cout << "s3: " << s3.c_str() << "\n" << std::endl;
-
-    s3 += s2;
-    std::cout << "s3 += s2: " << s3.c_str() << std::endl;
-
-    s3 += "Hello";
-    std::cout << "s3 += \"Hello\": " << s3.c_str() << "\n" << std::endl;
-
-    MyString s4 = s1 + s2;
-    std::cout << "MyString s4 = s1 + s2: " << s4.c_str() << std::endl;
-    
-    s4 = s4 + "World";
-    std::cout << "s4 = s4 + \"World\": " << s4.c_str() << "\n" << std::endl;
-
-    std::cout << "puts(s4): ";
-    puts(s4);
+    for(MyString::Iterator it = string.begin(); it != string.end(); ++it) {
+        std::cout << *it << std::endl;
+    }
 
     return 0;
 }
