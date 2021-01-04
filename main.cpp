@@ -210,13 +210,126 @@ public:
     }
 };
 
+template <typename T> class MyUniquePtr {
+private:
+    T* data;
+
+public:
+// rule of five reference: https://cpppatterns.com/patterns/rule-of-five.html
+
+    // constructor
+    MyUniquePtr(T* value) : data(value) {}
+    // copy constructor
+    MyUniquePtr(const MyUniquePtr& other) = delete;
+    // copy assignment constructor
+    MyUniquePtr& operator=(const MyUniquePtr& other) = delete;
+    // move constructor
+    MyUniquePtr(MyUniquePtr&& other) {
+        data = other.data;
+        other.data = nullptr;
+    }
+    // move assignment constructor
+    MyUniquePtr& operator=(MyUniquePtr&& other) {
+        if(&other != this) {
+            delete data;
+            data = other.data;
+            other.data = nullptr;
+        }
+
+        return *this;
+    }
+    // destructor
+    ~MyUniquePtr() {
+        delete data;
+    }
+
+    T* operator-> () const {
+        return data;
+    }
+
+    T operator* () const {
+        return *data;
+    }
+
+    operator bool() const {
+        return data != NULL;
+    }
+
+    T* Release() {
+        T* temp = data;
+        // DON'T delete data, as it will be used elsewhere
+        data = nullptr;
+        return temp;
+    }
+
+    // reset as per https://en.cppreference.com/w/cpp/memory/unique_ptr/reset
+    // different than moodle assignment
+    void Reset(T* data) {
+        delete this->data;
+        this->data = data;
+    }
+
+    // swap as per https://en.cppreference.com/w/cpp/memory/unique_ptr/swap2
+    // different than moodle assignment
+    void Swap(MyUniquePtr& other) {
+        T* temp = this->data;
+        this->data = other.data;
+        other.data = temp;
+    }
+
+    // TODO: implement deleters
+
+};
+
+struct Entity {
+    int id;
+
+    Entity(int val) : id(val) {};
+    Entity() {};
+};
+
 int main() {
 
-    MyString string = MyString("Hello World!");
+    // constructor
+    MyUniquePtr<Entity> entityPointer1(new Entity(10));
+    MyUniquePtr<Entity> entityPointer2(new Entity(20));
+    MyUniquePtr<Entity> entityPointer3(new Entity(30));
+    // copy constructor is a deleted method, which is the intended behaviour:
+    //MyUniquePtr<Entity> entityPointer2(entityPointer);
+    // same with copy assignment constructor
+    //MyUniquePtr<Entity> entityPointer2 = entityPointer;
+    // move constructor
+    MyUniquePtr<Entity> moveConstructed(std::move(entityPointer2));
+    std::cout << "(from entityPointer2) moveConstructed->id: " << moveConstructed->id << std::endl;
+    std::cout << "(bool)entitiyPointer2: " << (bool)entityPointer2 << std::endl;
+    // move assignment constructor
+    MyUniquePtr<Entity> moveAssignConstructed = std::move(entityPointer3);
+    std::cout << "(from entityPointer3) moveAssignConstructed->id: " << moveAssignConstructed->id << std::endl;
+    std::cout << "(bool)entityPointer3: " << (bool)entityPointer3 << std::endl;
 
-    for(MyString::Iterator it = string.begin(); it != string.end(); ++it) {
-        std::cout << *it << std::endl;
-    }
+    std::cout << std::endl;
+
+    std::cout << "entityPointer1->id: " << entityPointer1->id << std::endl;
+    std::cout << "(*entityPointer1).id: " << (*entityPointer1).id << std::endl;
+    std::cout << "(bool)entityPointer1: " << (bool)entityPointer1 << std::endl;
+
+    std::cout << std::endl;
+
+    Entity* entity = entityPointer1.Release();
+    std::cout << "Entity* entity = entityPointer1.Release();\n"
+        "entity->id: " << entity->id << "\n"
+        "(bool)entityPointer1: " << (bool)entityPointer1 << std::endl;
+
+    entityPointer2.Reset(new Entity(25));
+    std::cout << "entityPointer2.Reset(new Entity(25));\n"
+        "entityPointer2->id: " << entityPointer2->id << std::endl;
+    entityPointer3.Reset(new Entity(35));
+    std::cout << "entityPointer3.Reset(new Entity(35));" << std::endl;
+
+    entityPointer2.Swap(entityPointer3);
+    std::cout << "entityPointer2.Swap(entityPointer3);\n"
+        "entityPointer2->id: " << entityPointer2->id << "\n" <<
+        "entityPointer3->id: " << entityPointer3->id << std::endl;
 
     return 0;
 }
