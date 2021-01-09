@@ -331,7 +331,7 @@ int main() {
     std::cout << "Entity* entity = entityPointer1.Release();\n"
         "entity->id: " << entity->id << "\n"
         "(bool)entityPointer1: " << (bool)entityPointer1 << std::endl;
-    free(entity);
+    delete entity;
 
     entityPointer2.Reset(new Entity(25));
     std::cout << "entityPointer2.Reset(new Entity(25));\n"
