@@ -3,6 +3,7 @@ Author: Philipp Andert
 */
 
 #include <iostream>
+#include <memory>
 #include <string.h>
 
 class MyString {
@@ -24,6 +25,15 @@ private:
     }
 
 public:
+    // deleter reference: https://en.cppreference.com/w/cpp/memory/unique_ptr
+
+    struct Deleter {
+        void operator()(MyString* str) {
+            std::cout << "using Deleter of MyString" << std::endl;
+            // this calls ~MyString()
+            delete str;
+        }
+    };
 
     class Iterator{
     public:
@@ -210,15 +220,19 @@ public:
     }
 };
 
-template <typename T> class MyUniquePtr {
+template <class T, class D = std::default_delete<T>> class MyUniquePtr {
 private:
     T* data;
+    D deleter;
 
 public:
 // rule of five reference: https://cpppatterns.com/patterns/rule-of-five.html
+// unique_ptr reference: https://en.cppreference.com/w/cpp/memory/unique_ptr
 
     // constructor
     MyUniquePtr(T* value) : data(value) {}
+    // overloaded constructor with deleter
+    MyUniquePtr(T* value, const D& del) : data(value), deleter(del) {}
     // copy constructor
     MyUniquePtr(const MyUniquePtr& other) = delete;
     // copy assignment constructor
@@ -264,8 +278,8 @@ public:
 
     // reset as per https://en.cppreference.com/w/cpp/memory/unique_ptr/reset
     // different than moodle assignment
-    void Reset(T* data) {
-        delete this->data;
+    void Reset(T* data = nullptr) {
+        deleter(this->data);
         this->data = data;
     }
 
@@ -276,8 +290,6 @@ public:
         this->data = other.data;
         other.data = temp;
     }
-
-    // TODO: implement deleters
 
 };
 
@@ -319,6 +331,7 @@ int main() {
     std::cout << "Entity* entity = entityPointer1.Release();\n"
         "entity->id: " << entity->id << "\n"
         "(bool)entityPointer1: " << (bool)entityPointer1 << std::endl;
+    free(entity);
 
     entityPointer2.Reset(new Entity(25));
     std::cout << "entityPointer2.Reset(new Entity(25));\n"
@@ -331,5 +344,10 @@ int main() {
         "entityPointer2->id: " << entityPointer2->id << "\n" <<
         "entityPointer3->id: " << entityPointer3->id << std::endl;
 
+    // deleter demo
+    MyUniquePtr<MyString, MyString::Deleter> myStringPtr(new MyString("hello"));
+    std::cout << "myStringPtr->c_str(): " << myStringPtr->c_str() << std::endl;
+    std::cout << "myStringPtr.Reset(): ";
+    myStringPtr.Reset();
     return 0;
 }
